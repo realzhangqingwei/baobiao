@@ -26,7 +26,7 @@ def youjian():
             #wget.download(url)
             os.environ['url'] = str(url)
             print "开始下载: %s" % url
-            os.popen("wget -c  $url")
+            os.popen("wget -c -t2 -T5 $url")
             print "oops，下载完成"
         except:
             print "糟糕，下载出错,没有抓到"
