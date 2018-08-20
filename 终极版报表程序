@@ -1,4 +1,3 @@
-
 #!/usr/bin/env  python
 # -*- coding: utf-8 -*-
 import smtplib
@@ -14,6 +13,7 @@ import  codecs
 from email.mime.text import MIMEText
 import commands
 import re
+import sys
 ###################################################################################
 #完成初始化
 def chushihua():
@@ -161,19 +161,19 @@ def excel():
                 if shijian[0].isdigit():
                     print shijian
                 else:
-                    shijian=u"未知"
+                    shijian="unknown"
             except:
-                shijian=u"未知"
+                shijian="unknown"
             print "Name is %s" % name
             print "Total is %s" % total
             print "Mysqllog is %s" % mysqllog
             print "Diff is %s"  % diff
-            print "shijian is %s" % shijian
+            print "Shijian is %s" % shijian
             worksheet.write(A + str(j), str(name), bold)
             worksheet.write(B + str(j), int(total))
             worksheet.write(C + str(j), int(mysqllog))
             worksheet.write(D + str(j), int(diff))
-            worksheet.write(E + str(j), shijian)
+            worksheet.write(E + str(j), str(shijian))
             j = j + 1
             print "J is %d" % j
             print "==================================================================================================================================================="
@@ -196,8 +196,8 @@ def mail():
     yes_time_nyr = yes_time.strftime('%Y-%m-%d')
     HOST = "smtp.exmail.qq.com"
     SUBJECT = u"客户昨天日志报表分析表" + '.' + yes_time_nyr
-    TO = "收件人邮箱"
-    FROM = "发件人邮箱"
+    TO = "收件人"
+    FROM = "发件人"
     report = open('/home/python/test/test/html/report.html','rb').read()
     msg = MIMEText(report,"html","gb2312")
     msg['Subject'] = SUBJECT
@@ -207,7 +207,7 @@ def mail():
         server = smtplib.SMTP()
         server.connect(HOST,"25")
         server.starttls()
-        server.login("发件人邮箱","密码")
+        server.login("发件人","密码")
         server.sendmail(FROM, TO, msg.as_string())
         server.quit()
         print "邮件发送成功！"
@@ -222,12 +222,18 @@ def sort():
     df1.to_excel('mysqllog1.xlsx')
 
 def main():
-    chushihua()
-    youjian()
-    excel()
-    sort()
-    html()
-    mail()
+    old_stdout = sys.stdout
+    sys.stdout = open('/home/python/test/test/daoku.log', "w")
+    try:
+        chushihua()
+        youjian()
+        excel()
+        sort()
+        html()
+        mail()
+    finally:
+        sys.stdout.close()
+        sys.stdout = old_stdout
 
 if __name__ == '__main__':
     main()
