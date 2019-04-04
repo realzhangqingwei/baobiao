@@ -1,0 +1,100 @@
+#!/usr/bin/env  python
+# -*- coding: utf-8 -*-
+import smtplib
+import string
+import shutil
+import  os
+import time
+#from datetime import timedelta, datetime
+import datetime
+import os
+import re
+import sys
+###################################################################################
+class wgetMsqllog(object):
+    """下载客户的mysqllog的url"""
+    def __init__(self,pwd=os.path.dirname(os.path.realpath(__file__)), riqi=time.strftime("%Y%m%d"), logs=os.path.dirname(os.path.realpath(__file__)) + '/logs'):
+        self.pwd = pwd
+        self.riqi = riqi
+        self.logs = logs
+
+    def chushihua(self):
+        try:
+            if not os.path.exists(self.logs):
+                print "logs目录不存在 %s" % self.logs
+                os.mkdir(self.logs)
+                if os.path.exists(self.logs):
+                    print "创建文件夹成功 %s" % self.logs
+            else:
+                print "logs文件夹已经存在 %s" % self.logs
+        except:
+            print "创建目录发生异常  %s" % self.logs
+        try:
+            os.chdir(self.logs)
+            if os.path.exists(self.riqi):
+                shutil.rmtree(self.riqi)
+            else:
+                os.mkdir(riqi)
+        except:
+            print "文件夹删除失败 %s" % self.riqi
+
+    def wgetUrl(self, conf=os.path.dirname(os.path.realpath(__file__)) + '/kehu.txt'):
+        with open(conf) as f:
+            for line in f:
+                cmd = 'wget -t5 -T12 -P {0}  {1}'.format(self.logs + "/" + self.riqi, line)
+                if os.system(cmd) != 0:
+                    os.mknod(self.logs + "/" + self.riqi + "/" + re.split(r'/',line)[-1].rstrip())
+                    #print "文件下载失败,创建空白文件 {}".format(self.logs + "/" + self.riqi + "/" + re.split(r'/',line)[-1].rstrip())
+
+class sendMail(wgetMsqllog):
+    def __init__(self,Host,From,To,Port):
+        wgetMsqllog.__init__(self,pwd=os.path.dirname(os.path.realpath(__file__)), riqi=time.strftime("%Y%m%d"), logs=os.path.dirname(os.path.realpath(__file__)) + '/logs')
+        self.Host = Host
+        self.From = From
+        self.To =To
+        self.Port = Port
+    def sendmail(self):
+        wgetMsqllog.chushihua(self)
+        wgetMsqllog.wgetUrl(self)
+        for list in os.listdir(self.logs + "/" + self.riqi):
+            yest = str(datetime.date.today()-datetime.timedelta(days=1))
+            name = re.split(r'\.', list)[0] + "." + yest + "." +  "daoku"
+            with open(self.logs + "/" + self.riqi + "/" + list, 'r+') as f:
+                text = f.read()
+            BODY = string.join((
+                 "From: %s" % self.From,
+                 "To: %s" % self.To,
+                 "Subject: %s" % name ,
+                 "",
+                 text
+                 ), "\r\n")
+            try:
+                server = smtplib.SMTP()
+                server.connect(self.Host,self.Port)
+                server.starttls()
+                server.login(self.From,"Abc123456")
+                server.sendmail(self.From, [self.To], BODY)
+                server.quit()
+                print "邮件发送成功 %s" % name
+            except:
+                print "邮件发送失败,再次尝试一次 %s" % name
+                server = smtplib.SMTP()
+                server.connect(self.Host,self.Port)
+                server.starttls()
+                server.login(self.From,"密码")
+                server.sendmail(self.From, [self.To], BODY)
+                server.quit()
+
+            f.close()
+
+
+
+if __name__ == '__main__':
+    old_stdout = sys.stdout
+    sys.stdout = open(os.path.dirname(os.path.realpath(__file__)) + '/sendmail.log', "w")
+    try:
+        #l2 = sendMail("smtp.exmail.qq.com","legend_zhang@adsame.com","legend_zhang@adsame.com","25")
+        l2.sendmail()
+    finally:
+        sys.stdout.close()
+        sys.stdout = old_stdout
