@@ -111,7 +111,7 @@ def youjian():
 
 #入库excel表格
 ##中英文对应关系
-relation='{"eastmoney":"东方财富","zgf":"诸葛找房","tianya":"天涯","liba":"篱笆网","ft":"ft中文","cathay":"国泰银科","ifeng":"凤凰网","jrj":"金融界","stockstar":"证券之星","pearvideo":"梨视频","cnr":"央广网","cyol":"中青在线","hexun":"和讯","rayli":"瑞丽女性网","chinadaily":"中国日报","yoka":"yoka","gimc_eagle":"gimc","gimc_eaglev2":"gimc2","wenjuan":"问卷网","ap":"ap","eagleasp":"eagle","sammix":"sammix","samba":"samba","botuu":"博图(eagle)","petrel":"petrel","hfm":"华榭中国","vogue":"vogue","mcchina":"嘉人","adplace":"台湾adplace","jsmedia":"台湾测试","caixin":"财新网","explorer_demo":"explorer_demo" }'
+relation='{"test":"测试"}
 obj = json.loads(relation)
 def excel():
     now_time = datetime.datetime.now()
@@ -212,8 +212,8 @@ def mail():
     yes_time_nyr = yes_time.strftime('%Y-%m-%d')
     HOST = "smtp.exmail.qq.com"
     SUBJECT = u"客户昨天日志报表分析表" + '.' + yes_time_nyr
-    TO = "legend_zhang@adsame.com"
-    FROM = "legend_zhang@adsame.com"
+    TO = ["收件人",]  #以列表的形式存在,不然会乱码
+    FROM = "发件人"
     report = open('/home/python/test/test/html/report.html','rb').read()
     msg = MIMEText(report,"html","gb2312")
     msg['Subject'] = SUBJECT
@@ -223,7 +223,7 @@ def mail():
         server = smtplib.SMTP()
         server.connect(HOST,"25")
         server.starttls()
-        server.login("legend_zhang@adsame.com","密码")
+        server.login("发件人","密码")
         server.sendmail(FROM, TO, msg.as_string())
         server.quit()
         print "邮件发送成功！"

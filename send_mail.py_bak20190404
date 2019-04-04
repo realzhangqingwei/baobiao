@@ -72,7 +72,7 @@ class sendMail(wgetMsqllog):
                 server = smtplib.SMTP()
                 server.connect(self.Host,self.Port)
                 server.starttls()
-                server.login(self.From,"Abc123456")
+                server.login(self.From,邮箱密码)
                 server.sendmail(self.From, [self.To], BODY)
                 server.quit()
                 print "邮件发送成功 %s" % name
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     old_stdout = sys.stdout
     sys.stdout = open(os.path.dirname(os.path.realpath(__file__)) + '/sendmail.log', "w")
     try:
-        #l2 = sendMail("smtp.exmail.qq.com","legend_zhang@adsame.com","legend_zhang@adsame.com","25")
+        l2 = sendMail("smtp.exmail.qq.com","发件人","收件人","25")
         l2.sendmail()
     finally:
         sys.stdout.close()
